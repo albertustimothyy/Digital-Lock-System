@@ -7,10 +7,6 @@ PACKAGE main_function IS
     FUNCTION bcd_to_7segment (
         usr_input : STD_LOGIC_VECTOR(3 DOWNTO 0)
     ) RETURN STD_LOGIC_VECTOR;
-    -- Convert 3 bits input to digits
-    FUNCTION bits_3_to_digits (
-        count_disp : STD_LOGIC_VECTOR(2 DOWNTO 0)
-    ) RETURN STD_LOGIC_VECTOR;
     -- convert integer to 4 bits logic vector
     FUNCTION integer_to_4bits (
         rand_num : INTEGER RANGE 1 TO 6
@@ -48,27 +44,6 @@ PACKAGE BODY main_function IS
             WHEN OTHERS => segment := "1111111";
         END CASE;
         RETURN segment;
-    END;
-
-    -- Convert 3 bits input to digits
-    FUNCTION bits_3_to_digits (
-        count_disp : STD_LOGIC_VECTOR(2 DOWNTO 0)
-    )
-        RETURN STD_LOGIC_VECTOR IS
-        VARIABLE dig : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    BEGIN
-        CASE(count_disp) IS
-            WHEN "000" => dig := "01111111";
-            WHEN "001" => dig := "10111111";
-            WHEN "010" => dig := "11011111";
-            WHEN "011" => dig := "11101111";
-            WHEN "100" => dig := "11110111";
-            WHEN "101" => dig := "11111011";
-            WHEN "110" => dig := "11111101";
-            WHEN "111" => dig := "11111110";
-            WHEN OTHERS => dig := "11111111";
-        END CASE;
-        RETURN dig;
     END;
 
     -- convert integer to 4 bits logic vector
