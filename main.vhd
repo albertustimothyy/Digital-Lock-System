@@ -19,11 +19,11 @@ END main;
 -- Architecture
 ARCHITECTURE rtl OF main IS
     -- Declaration Main State
-    TYPE states IS (IDLE, A, B, C, D, E, F, RESET, IDLE_RANDOM, A_RANDOM, B_RANDOM, RESET_RANDOM);
+    TYPE states IS (INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET, INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, RESET_RANDOM);
     SIGNAL state : states;
 
     -- Declaration for Clock 
-    TYPE debounce_states IS (DEBOUNCE_IDLE, SHIFT_STATE);
+    TYPE debounce_states IS (DEBOUNCE_INIT, SHIFT_STATE);
     SIGNAL clk_slow : STD_LOGIC;
     SIGNAL debounce_state : debounce_states;
     SIGNAL debounce_signal : STD_LOGIC;
@@ -74,9 +74,9 @@ BEGIN
     BEGIN
         IF rising_edge(clk_slow) THEN
             CASE(debounce_state) IS
-                WHEN DEBOUNCE_IDLE =>
+                WHEN DEBOUNCE_INIT =>
                 IF (NEXT_BTN = '0') THEN
-                    debounce_state <= DEBOUNCE_IDLE;
+                    debounce_state <= DEBOUNCE_INIT;
                 ELSE
                     debounce_state <= SHIFT_STATE;
                 END IF;
@@ -87,15 +87,15 @@ BEGIN
                     IF (NEXT_BTN = '1') THEN
                         debounce_signal <= '1';
                     END IF;
-                    debounce_state <= DEBOUNCE_IDLE;
+                    debounce_state <= DEBOUNCE_INIT;
                 ELSE
                     count_shift <= count_shift + 1;
                 END IF;
             END CASE;
-            -- RESET_BTN to reset to IDLE state (Method 1)
+            -- RESET_BTN to reset to INIT state (Method 1)
             IF RESET_BTN = '1' THEN
                 input_pass(23 DOWNTO 0) <= (OTHERS => '0');
-                state <= IDLE;
+                state <= INIT;
                 -- RESET2_BTN to reset all state and signal (Method 2)
             ELSIF RESET2_BTN = '1' THEN
                 answer <= (OTHERS => '0');
@@ -103,34 +103,34 @@ BEGIN
                 rand_generator <= '1';
                 rand_pass_1 <= rand_array(rand_i)(0);
                 rand_pass_2 <= rand_array(rand_i)(1);
-                state <= A_RANDOM;
+                state <= BUSY1_RANDOM;
                 -- Receiving Input 
             ELSIF (debounce_signal = '1') THEN
                 CASE(state) IS
                     -- Method 1
-                    WHEN IDLE =>
+                    WHEN INIT =>
                     input_pass(23 DOWNTO 20) <= SWITCH(3 DOWNTO 0);
-                    state <= A;
-                    WHEN A =>
+                    state <= BUSY1;
+                    WHEN BUSY1 =>
                     input_pass(19 DOWNTO 16) <= SWITCH(3 DOWNTO 0);
-                    state <= B;
-                    WHEN B =>
+                    state <= BUSY2;
+                    WHEN BUSY2 =>
                     input_pass(15 DOWNTO 12) <= SWITCH(3 DOWNTO 0);
-                    state <= C;
-                    WHEN C =>
+                    state <= BUSY3;
+                    WHEN BUSY3 =>
                     input_pass(11 DOWNTO 8) <= SWITCH(3 DOWNTO 0);
-                    state <= D;
-                    WHEN D =>
+                    state <= BUSY4;
+                    WHEN BUSY4 =>
                     input_pass(7 DOWNTO 4) <= SWITCH(3 DOWNTO 0);
-                    state <= E;
-                    WHEN E =>
+                    state <= BUSY5;
+                    WHEN BUSY5 =>
                     input_pass(3 DOWNTO 0) <= SWITCH(3 DOWNTO 0);
-                    state <= F;
-                    WHEN F => state <= F;
+                    state <= BUSY6;
+                    WHEN BUSY6 => state <= BUSY6;
                     WHEN RESET => state <= RESET;
                     -- Method 2
-                    WHEN IDLE_RANDOM => state <= IDLE_RANDOM;
-                    WHEN A_RANDOM =>
+                    WHEN INIT_RANDOM => state <= INIT_RANDOM;
+                    WHEN BUSY1_RANDOM =>
 
                     CASE(rand_pass_1) IS
                         WHEN 1 => answer(7 DOWNTO 4) <= "0001";
@@ -152,8 +152,8 @@ BEGIN
                         WHEN 6 => answer(3 DOWNTO 0) <= "0101";
                         WHEN OTHERS => answer(3 DOWNTO 0) <= "0000";
                     END CASE;
-                    state <= B_RANDOM;
-                    WHEN B_RANDOM =>
+                    state <= BUSY2_RANDOM;
+                    WHEN BUSY2_RANDOM =>
                     random_input(3 DOWNTO 0) <= SWITCH(3 DOWNTO 0);
                     state <= RESET_RANDOM;
                     WHEN RESET_RANDOM =>
@@ -178,13 +178,13 @@ BEGIN
             ELSE
                 count_flk <= count_flk + 1;
             END IF;
-            IF state = E THEN
+            IF state = BUSY5 THEN
                 IF switch_flk = '1' THEN
                     state <= RESET;
                 END IF;
             ELSIF state = RESET THEN
                 IF switch_flk = '0' THEN
-                    state <= E;
+                    state <= BUSY5;
                 END IF;
             END IF;
         END IF;
@@ -207,15 +207,15 @@ BEGIN
 
         CASE (state) IS
                 -- Method 2
-            WHEN IDLE_RANDOM =>
+            WHEN INIT_RANDOM =>
                 dig := "11111111";
                 seg := "1111111";
                 LED <= (OTHERS => '0');
-            WHEN A_RANDOM =>
+            WHEN BUSY1_RANDOM =>
                 dig := "01111111";
                 seg := integer_to_7segment(rand_pass_1);
                 LED <= (OTHERS => '0');
-            WHEN B_RANDOM =>
+            WHEN BUSY2_RANDOM =>
                 dig := "10111111";
                 seg := integer_to_7segment(rand_pass_2);
             WHEN RESET_RANDOM =>
@@ -247,14 +247,14 @@ BEGIN
                     END CASE;
                 END IF;
                 --- Part 2 Display ---
-            WHEN IDLE =>
+            WHEN INIT =>
                 dig := "11111111";
                 seg := "1111111";
                 LED <= (OTHERS => '0');
-            WHEN A =>
+            WHEN BUSY1 =>
                 dig := "01111111";
                 seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-            WHEN B =>
+            WHEN BUSY2 =>
                 CASE(display_counter(15 DOWNTO 14)) IS
                 WHEN "00" => dig := "01111111";
                 WHEN "01" => dig := "10111111";
@@ -265,7 +265,7 @@ BEGIN
                 WHEN "01" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
                 WHEN OTHERS => seg := "1111111";
                 END CASE;
-            WHEN C =>
+            WHEN BUSY3 =>
                 CASE(display_counter(15 DOWNTO 14)) IS
                 WHEN "00" => dig := "01111111";
                 WHEN "01" => dig := "10111111";
@@ -278,7 +278,7 @@ BEGIN
                 WHEN "10" => seg := bcd_to_7segment(input_pass(15 DOWNTO 12));
                 WHEN OTHERS => seg := "1111111";
                 END CASE;
-            WHEN D =>
+            WHEN BUSY4 =>
                 CASE(display_counter(15 DOWNTO 14)) IS
                 WHEN "00" => dig := "01111111";
                 WHEN "01" => dig := "10111111";
@@ -293,7 +293,7 @@ BEGIN
                 WHEN "11" => seg := bcd_to_7segment(input_pass(11 DOWNTO 8));
                 WHEN OTHERS => seg := "1111111";
                 END CASE;
-            WHEN E =>
+            WHEN BUSY5 =>
                 dig := bits_3_to_digits(display_counter(15 DOWNTO 13));
                 CASE(display_counter(15 DOWNTO 13)) IS
                 WHEN "000" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
@@ -303,7 +303,7 @@ BEGIN
                 WHEN "100" => seg := bcd_to_7segment(input_pass(7 DOWNTO 4));
                 WHEN OTHERS => seg := "1111111";
                 END CASE;
-            WHEN F =>
+            WHEN BUSY6 =>
                 dig := bits_3_to_digits(display_counter(15 DOWNTO 13));
                 CASE(display_counter(15 DOWNTO 13)) IS
                 WHEN "000" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
