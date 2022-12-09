@@ -3,24 +3,34 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 
 PACKAGE main_function IS
+    -- convert BCD to Seven Segment Input
     FUNCTION bcd_to_7segment (
         usr_input : STD_LOGIC_VECTOR(3 DOWNTO 0)
     ) RETURN STD_LOGIC_VECTOR;
-
+    -- Convert 3 bits input to digits
     FUNCTION bits_3_to_digits (
         count_disp : STD_LOGIC_VECTOR(2 DOWNTO 0)
     ) RETURN STD_LOGIC_VECTOR;
-
-    FUNCTION integer_to_7segment (
-        rand_num : INTEGER RANGE 1 TO 5
+    -- convert integer to 4 bits logic vector
+    FUNCTION integer_to_4bits (
+        rand_num : INTEGER RANGE 1 TO 6
+    ) RETURN STD_LOGIC_VECTOR;
+    --  simple hashing algorithm for method 1
+    FUNCTION simple_hash(
+        hash_input : STD_LOGIC_VECTOR(23 DOWNTO 0)
+    ) RETURN STD_LOGIC_VECTOR;
+    --  simple hashing algorithm for method 2
+    FUNCTION random_simple_hash(
+        hash_input : STD_LOGIC_VECTOR(7 DOWNTO 0)
     ) RETURN STD_LOGIC_VECTOR;
 
 END PACKAGE main_function;
 
 PACKAGE BODY main_function IS
-
+    -- convert BCD to Seven Segment Input
     FUNCTION bcd_to_7segment (
-        usr_input : STD_LOGIC_VECTOR(3 DOWNTO 0))
+        usr_input : STD_LOGIC_VECTOR(3 DOWNTO 0)
+    )
         RETURN STD_LOGIC_VECTOR IS
         VARIABLE segment : STD_LOGIC_VECTOR(6 DOWNTO 0);
     BEGIN
@@ -35,12 +45,15 @@ PACKAGE BODY main_function IS
             WHEN "0111" => segment := "1111000"; -- 7
             WHEN "1000" => segment := "0000000"; -- 8
             WHEN "1001" => segment := "0010000"; -- 9
-            WHEN OTHERS => segment := "1000000"; -- 0
+            WHEN OTHERS => segment := "1111111";
         END CASE;
         RETURN segment;
     END;
+
+    -- Convert 3 bits input to digits
     FUNCTION bits_3_to_digits (
-        count_disp : STD_LOGIC_VECTOR(2 DOWNTO 0))
+        count_disp : STD_LOGIC_VECTOR(2 DOWNTO 0)
+    )
         RETURN STD_LOGIC_VECTOR IS
         VARIABLE dig : STD_LOGIC_VECTOR(7 DOWNTO 0);
     BEGIN
@@ -57,20 +70,53 @@ PACKAGE BODY main_function IS
         END CASE;
         RETURN dig;
     END;
-    FUNCTION integer_to_7segment (
-        rand_num : INTEGER RANGE 1 TO 5)
+
+    -- convert integer to 4 bits logic vector
+    FUNCTION integer_to_4bits (
+        rand_num : INTEGER RANGE 1 TO 6
+    )
         RETURN STD_LOGIC_VECTOR IS
-        VARIABLE segment : STD_LOGIC_VECTOR(6 DOWNTO 0);
+        VARIABLE bit_4 : STD_LOGIC_VECTOR(3 DOWNTO 0);
     BEGIN
         CASE(rand_num) IS
-            WHEN 5 => segment := "0010010";
-            WHEN 4 => segment := "0011001";
-            WHEN 3 => segment := "0110000";
-            WHEN 2 => segment := "0100100";
-            WHEN 1 => segment := "1111001";
-            WHEN OTHERS => segment := "1111111";
+            WHEN 6 => bit_4 := "0110";
+            WHEN 5 => bit_4 := "0101";
+            WHEN 4 => bit_4 := "0100";
+            WHEN 3 => bit_4 := "0011";
+            WHEN 2 => bit_4 := "0010";
+            WHEN 1 => bit_4 := "0001";
+            WHEN OTHERS => bit_4 := "1111";
         END CASE;
-        RETURN segment;
+        RETURN bit_4;
     END;
 
+    --  simple hashing algorithm for method 1
+    FUNCTION simple_hash(
+        hash_input : STD_LOGIC_VECTOR(23 DOWNTO 0)
+    )
+        RETURN STD_LOGIC_VECTOR IS
+        VARIABLE hash_value : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    BEGIN
+        hash_value(31 DOWNTO 28) := hash_input(3 DOWNTO 0) XOR "1010";
+        hash_value(27 DOWNTO 24) := hash_input(7 DOWNTO 4) XOR hash_input(3 DOWNTO 0);
+        hash_value(23 DOWNTO 20) := hash_input(11 DOWNTO 8) XOR "0101";
+        hash_value(19 DOWNTO 16) := hash_input(15 DOWNTO 12) XOR hash_input(11 DOWNTO 8);
+        hash_value(15 DOWNTO 12) := hash_input(19 DOWNTO 16) XOR "0110";
+        hash_value(11 DOWNTO 8) := hash_input(23 DOWNTO 20) XOR hash_input(19 DOWNTO 16);
+        hash_value(7 DOWNTO 4) := hash_input(7 DOWNTO 4) XOR "1001";
+        hash_value(3 DOWNTO 0) := hash_input(19 DOWNTO 16) XOR hash_input(3 DOWNTO 0);
+        RETURN hash_value;
+    END FUNCTION;
+
+    --  simple hashing algorithm for method 2
+    FUNCTION random_simple_hash(
+        hash_input : STD_LOGIC_VECTOR(7 DOWNTO 0)
+    ) RETURN STD_LOGIC_VECTOR IS
+        VARIABLE hash_value : STD_LOGIC_VECTOR(11 DOWNTO 0);
+    BEGIN
+        hash_value(11 DOWNTO 8) := hash_input(3 DOWNTO 0) XOR "0110";
+        hash_value(7 DOWNTO 4) := hash_input(7 DOWNTO 4) XOR hash_input(3 DOWNTO 0);
+        hash_value(3 DOWNTO 0) := hash_input(7 DOWNTO 4) XOR "1001";
+        RETURN hash_value;
+    END FUNCTION;
 END PACKAGE BODY main_function;
