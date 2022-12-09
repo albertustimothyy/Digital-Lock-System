@@ -178,13 +178,13 @@ BEGIN
             ELSE
                 count_flk <= count_flk + 1;
             END IF;
-            IF state = BUSY5 THEN
+            IF state = BUSY6 THEN
                 IF switch_flk = '1' THEN
                     state <= RESET;
                 END IF;
             ELSIF state = RESET THEN
                 IF switch_flk = '0' THEN
-                    state <= BUSY5;
+                    state <= BUSY6;
                 END IF;
             END IF;
         END IF;
