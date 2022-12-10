@@ -17,11 +17,18 @@ Muhammad Fajri Alqomaril &nbsp;&nbsp;(2106651635) </br>
 
 ## Features
 Berikut fitur-fitur yang digunakan
+
+
 ### 7-Segment
-`7-Segment digunakan sebagai user interface untuk menampilkan password yang sedang diinput oleh user ke dalam Digital Lock System. 7-segment ini menggunakan flickering algorithm untuk melakukan control berapa lama password yang dimasukkan user bertahan pada 7-segment display.`
+`7-Segment digunakan sebagai user interface untuk menampilkan password yang sedang diinput oleh user ke dalam Digital Lock System.`
 
 ### Debounce Algorithm
 `Pada pengimplementasian Digital Lock System, digunakan button untuk memasukkan tiap angka password dan untuk me-reset rangkaian. Pada dasarnya, saat menekan button sering terjadi ketidakstablian sinyal yang disebabkan oleh button itu sendiri (saklar manual). Oleh karena itu, digunakan debounce algorithm untuk menstabilkan sinyal dari button agar dapat di proses oleh system tanpa kendala sehingga sinyal dapat diproses dengan efektif.`
 
 ### Encryption (Hashing)
 `Hashing atau enkripsi password digunakan untuk mengamankan password yang dimiliki oleh user. Hashing juga digunakan untuk mempercepat proses pengecekan password dalam sistem keamanan ini. `
+
+## Generate Random Number
+`Generate Random Number digunakan untuk memilih digit kesekian yang harus dimasukkan user ke device agar lock system terbuka.`
+
+## FSM
