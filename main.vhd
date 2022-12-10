@@ -19,7 +19,10 @@ END main;
 -- Architecture
 ARCHITECTURE rtl OF main IS
     -- Declaration Main State
-    TYPE states IS (INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET, INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, RESET_RANDOM);
+    TYPE states IS (
+        INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET,
+        INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, ENCRYPTING_RANDOM, RESET_RANDOM
+    );
     SIGNAL state : states;
 
     -- Declaration for Clock 
@@ -27,13 +30,10 @@ ARCHITECTURE rtl OF main IS
     SIGNAL clk_slow : STD_LOGIC;
     SIGNAL debounce_state : debounce_states;
     SIGNAL debounce_signal : STD_LOGIC;
-    SIGNAL count_slow : INTEGER := 0;
     SIGNAL count_shift : INTEGER := 0;
     ----- Flicker
     SIGNAL count_flk : INTEGER := 0;
     SIGNAL switch_flk : STD_LOGIC := '0';
-    -----  Display Counter
-    SIGNAL display_counter : STD_LOGIC_VECTOR(15 DOWNTO 0);
     ----- User Inputs Password
     SIGNAL input_pass : STD_LOGIC_VECTOR(23 DOWNTO 0);
     ----- Correct Password
@@ -55,8 +55,11 @@ ARCHITECTURE rtl OF main IS
     SIGNAL rand_pass_1, rand_pass_2 : INTEGER RANGE 1 TO 6;
     SIGNAL answer, random_input : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-BEGIN
+    -- Hashed Password
+    SIGNAL hashed_password : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL rand_hashed_password, rand_hashed_input : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
+<<<<<<< HEAD
     -- Clock process
     PROCESS (CLOCK) BEGIN
         IF rising_edge(CLOCK) THEN
@@ -70,20 +73,23 @@ BEGIN
         END IF;
     END PROCESS;
 
+=======
+BEGIN
+>>>>>>> 9cb8f0273df614dd9d25e8dfe68064ef53fb251c
     -- Main Process
-    PROCESS (clk_slow, RESET_BTN, RESET2_BTN)
+    PROCESS (CLOCK, RESET_BTN, RESET2_BTN)
     BEGIN
-        IF rising_edge(clk_slow) THEN
+        IF rising_edge(CLOCK) THEN
             CASE(debounce_state) IS
                 WHEN DEBOUNCE_INIT =>
-                IF (NEXT_BTN = '0') THEN
-                    debounce_state <= DEBOUNCE_INIT;
-                ELSE
+                IF (NEXT_BTN = '1') THEN
                     debounce_state <= SHIFT_STATE;
+                ELSE
+                    debounce_state <= DEBOUNCE_INIT;
                 END IF;
                 debounce_signal <= '0';
                 WHEN SHIFT_STATE =>
-                IF (count_shift = 8) THEN
+                IF (count_shift = 6) THEN
                     count_shift <= 0;
                     IF (NEXT_BTN = '1') THEN
                         debounce_signal <= '1';
@@ -112,6 +118,7 @@ BEGIN
                     WHEN INIT =>
                     input_pass(23 DOWNTO 20) <= SWITCH(3 DOWNTO 0);
                     state <= BUSY1;
+                    hashed_password <= simple_hash(password);
                     WHEN BUSY1 =>
                     input_pass(19 DOWNTO 16) <= SWITCH(3 DOWNTO 0);
                     state <= BUSY2;
@@ -142,6 +149,7 @@ BEGIN
                         WHEN 6 => answer(7 DOWNTO 4) <= "0101";
                         WHEN OTHERS => answer(7 DOWNTO 4) <= "0000";
                     END CASE;
+
                     -- Receive Input (Method 2)
                     random_input(7 DOWNTO 4) <= SWITCH(3 DOWNTO 0);
                     CASE(rand_pass_2) IS
@@ -156,6 +164,10 @@ BEGIN
                     state <= BUSY2_RANDOM;
                     WHEN BUSY2_RANDOM =>
                     random_input(3 DOWNTO 0) <= SWITCH(3 DOWNTO 0);
+                    state <= ENCRYPTING_RANDOM;
+                    WHEN ENCRYPTING_RANDOM =>
+                    rand_hashed_input <= random_simple_hash(random_input);
+                    rand_hashed_password <= random_simple_hash(answer);
                     state <= RESET_RANDOM;
                     WHEN RESET_RANDOM =>
                     state <= RESET_RANDOM;
@@ -190,6 +202,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+<<<<<<< HEAD
     -- Clock for Displaying Output
     PROCESS (CLOCK)
     BEGIN
@@ -202,6 +215,9 @@ BEGIN
     END PROCESS;
 
     
+=======
+
+>>>>>>> 9cb8f0273df614dd9d25e8dfe68064ef53fb251c
     -- Output Process
     Output : PROCESS (state)
         VARIABLE seg : STD_LOGIC_VECTOR(6 DOWNTO 0);
@@ -221,33 +237,17 @@ BEGIN
             WHEN BUSY2_RANDOM =>
                 dig := "10111111";
                 seg := bcd_to_7segment(integer_to_4bits(rand_pass_2));
+            WHEN ENCRYPTING_RANDOM =>
+
             WHEN RESET_RANDOM =>
                 -- Cheking Input 
-                IF random_simple_hash(answer) = random_simple_hash(random_input) THEN
+                IF rand_hashed_password = rand_hashed_input THEN
                     LED <= "1111111111111111";
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => dig := "11111101";
-                    WHEN "01" => dig := "11111110";
-                    WHEN OTHERS => dig := "11111111";
-                    END CASE;
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => seg := "1000000";
-                    WHEN "01" => seg := "0001001";
-                    WHEN OTHERS => seg := "1111111";
-                    END CASE;
+                    dig := "11111110";
+                    seg := "1000000";
                 ELSE
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => dig := "11111110";
-                    WHEN "01" => dig := "11111101";
-                    WHEN "10" => dig := "11111011";
-                    WHEN OTHERS => dig := "11111111";
-                    END CASE;
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => seg := "0010010";
-                    WHEN "01" => seg := "1000111";
-                    WHEN "10" => seg := "0001110";
-                    WHEN OTHERS => seg := "1111111";
-                    END CASE;
+                    dig := "11111110";
+                    seg := "0001001";
                 END IF;
                 --- Part 2 Display ---
             WHEN INIT =>
@@ -256,96 +256,31 @@ BEGIN
                 LED <= (OTHERS => '0');
             WHEN BUSY1 =>
                 dig := "01111111";
-                seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
+                seg := bcd_to_7segment("0001");
             WHEN BUSY2 =>
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => dig := "01111111";
-                WHEN "01" => dig := "10111111";
-                WHEN OTHERS => dig := "11111111";
-                END CASE;
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-                WHEN "01" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
-                WHEN OTHERS => seg := "1111111";
-                END CASE;
+                dig := "10111111";
+                seg := bcd_to_7segment("0010");
             WHEN BUSY3 =>
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => dig := "01111111";
-                WHEN "01" => dig := "10111111";
-                WHEN "10" => dig := "11011111";
-                WHEN OTHERS => dig := "11111111";
-                END CASE;
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-                WHEN "01" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
-                WHEN "10" => seg := bcd_to_7segment(input_pass(15 DOWNTO 12));
-                WHEN OTHERS => seg := "1111111";
-                END CASE;
+                dig := "11011111";
+                seg := bcd_to_7segment("0011");
             WHEN BUSY4 =>
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => dig := "01111111";
-                WHEN "01" => dig := "10111111";
-                WHEN "10" => dig := "11011111";
-                WHEN "11" => dig := "11101111";
-                WHEN OTHERS => dig := "11111111";
-                END CASE;
-                CASE(display_counter(15 DOWNTO 14)) IS
-                WHEN "00" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-                WHEN "01" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
-                WHEN "10" => seg := bcd_to_7segment(input_pass(15 DOWNTO 12));
-                WHEN "11" => seg := bcd_to_7segment(input_pass(11 DOWNTO 8));
-                WHEN OTHERS => seg := "1111111";
-                END CASE;
+                dig := "11101111";
+                seg := bcd_to_7segment("0100");
             WHEN BUSY5 =>
-                dig := bits_3_to_digits(display_counter(15 DOWNTO 13));
-                CASE(display_counter(15 DOWNTO 13)) IS
-                WHEN "000" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-                WHEN "001" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
-                WHEN "010" => seg := bcd_to_7segment(input_pass(15 DOWNTO 12));
-                WHEN "011" => seg := bcd_to_7segment(input_pass(11 DOWNTO 8));
-                WHEN "100" => seg := bcd_to_7segment(input_pass(7 DOWNTO 4));
-                WHEN OTHERS => seg := "1111111";
-                END CASE;
+                dig := "11110111";
+                seg := bcd_to_7segment("0101");
             WHEN BUSY6 =>
-                dig := bits_3_to_digits(display_counter(15 DOWNTO 13));
-                CASE(display_counter(15 DOWNTO 13)) IS
-                WHEN "000" => seg := bcd_to_7segment(input_pass(23 DOWNTO 20));
-                WHEN "001" => seg := bcd_to_7segment(input_pass(19 DOWNTO 16));
-                WHEN "010" => seg := bcd_to_7segment(input_pass(15 DOWNTO 12));
-                WHEN "011" => seg := bcd_to_7segment(input_pass(11 DOWNTO 8));
-                WHEN "100" => seg := bcd_to_7segment(input_pass(7 DOWNTO 4));
-                WHEN "101" => seg := bcd_to_7segment(input_pass(3 DOWNTO 0));
-                WHEN "110" => seg := "1111111";
-                WHEN "111" => seg := "1111111";
-                WHEN OTHERS => seg := "1111111";
-                END CASE;
+                dig := "11111011";
+                seg := bcd_to_7segment("0110");
             WHEN RESET =>
 
-                IF (state = RESET) AND (simple_hash(input_pass) = simple_hash(password)) THEN
+                IF (state = RESET) AND (hashed_password = simple_hash(input_pass)) THEN
                     LED <= "1111111111111111";
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => dig := "11111101";
-                    WHEN "01" => dig := "11111110";
-                    WHEN OTHERS => dig := "11111111";
-                    END CASE;
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => seg := "1000000";
-                    WHEN "01" => seg := "0001001";
-                    WHEN OTHERS => seg := "1111111";
-                    END CASE;
+                    dig := "11111110";
+                    seg := "1000000";
                 ELSE
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => dig := "11111110";
-                    WHEN "01" => dig := "11111101";
-                    WHEN "10" => dig := "11111011";
-                    WHEN OTHERS => dig := "11111111";
-                    END CASE;
-                    CASE(display_counter(15 DOWNTO 14)) IS
-                    WHEN "00" => seg := "0010010";
-                    WHEN "01" => seg := "1000111";
-                    WHEN "10" => seg := "0001110";
-                    WHEN OTHERS => seg := "1111111";
-                    END CASE;
+                    dig := "11111110";
+                    seg := "0001001";
                 END IF;
         END CASE;
 
