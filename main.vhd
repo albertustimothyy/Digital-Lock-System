@@ -69,6 +69,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+
     -- Main Process
     PROCESS (clk_slow, RESET_BTN, RESET2_BTN)
     BEGIN
@@ -199,6 +200,8 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+
+    
     -- Output Process
     Output : PROCESS (state)
         VARIABLE seg : STD_LOGIC_VECTOR(6 DOWNTO 0);

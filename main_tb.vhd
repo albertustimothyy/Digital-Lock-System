@@ -16,6 +16,10 @@ ARCHITECTURE behavior OF main_tb IS
             LED : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
         );
     END COMPONENT;
+    
+    -- Declaration Main State
+    TYPE states IS (INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET, INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, RESET_RANDOM);
+    SIGNAL state : states;
 
     -- Inputs
     SIGNAL RESET_BTN, NEXT_BTN, RESET2_BTN : STD_LOGIC := '0';
@@ -24,7 +28,7 @@ ARCHITECTURE behavior OF main_tb IS
     SIGNAL SEVEN_SEGMENT : STD_LOGIC_VECTOR(6 DOWNTO 0);
     SIGNAL DIGITS : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL LED : STD_LOGIC_VECTOR(15 DOWNTO 0);
-
+    signal clk_slow : STD_LOGIC; 
     SIGNAL CLOCK : STD_LOGIC;
     CONSTANT clk_period : TIME := 5 ns;
 
@@ -53,17 +57,21 @@ BEGIN
     -- Stimulus process
     STIM_PROC : PROCESS
     BEGIN
-        WAIT FOR clk_period;
+        
 
         -- Initialize inputs here
-
+        clk_slow <= '0';
         WAIT FOR clk_period;
 
         -- Add stimulus here
+        clk_slow <= '1';
+        WAIT FOR clk_period;
+        
 
         WAIT;
     END PROCESS;
 
+    -- output
     RESET_PROC : PROCESS
     BEGIN
         -- Method 1
@@ -71,6 +79,7 @@ BEGIN
         WAIT FOR clk_period;
         RESET_BTN <= '0';
         WAIT FOR clk_period;
+
 
         SWITCH <= "0101";
         NEXT_BTN <= '1';
@@ -91,10 +100,59 @@ BEGIN
         NEXT_BTN <= '1';
         WAIT FOR clk_period;
 
+
+
+
         ASSERT (LED = "0000000000000000" AND DIGITS = "11111110" AND SEVEN_SEGMENT = "0010010")
         REPORT "Wrong Password";
         WAIT FOR clk_period;
         -- Method 2
+
+        state <= INIT;
+        WAIT FOR 400 ns;
+
         WAIT;
+    END PROCESS;
+
+    PROC_OUTP : PROCESS
+    BEGIN
+        --method 2
+        state <= INIT;
+        WAIT FOR 400 ns;
+
+        state <= BUSY1_RANDOM;
+        WAIT FOR 400 ns;
+
+        state <= BUSY2_RANDOM;
+        WAIT FOR 400 ns;
+
+        state <= RESET_RANDOM;
+        WAIT FOR 400 ns;
+
+        state <= INIT;
+        WAIT FOR 400 ns;
+
+        state <= BUSY1;
+        WAIT FOR 400 ns;
+
+        state <= BUSY2;
+        WAIT FOR 400 ns;
+
+        state <= BUSY3;
+        WAIT FOR 400 ns;
+
+        state <= BUSY4;
+        WAIT FOR 400 ns;
+
+        state <= BUSY5;
+        WAIT FOR 400 ns;
+
+        state <= BUSY6;
+        WAIT FOR 400 ns;
+
+        state <= RESET;
+        WAIT FOR 400 ns;
+
+
     END PROCESS;
 END;

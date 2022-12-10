@@ -1,0 +1,40 @@
+{C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main.vhd} {1 {vcom -work work -2002 -explicit -stats=none {C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main.vhd}
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package NUMERIC_STD
+-- Loading package main_function
+-- Compiling entity main
+-- Compiling architecture rtl of main
+
+} {} {}} {C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd} {0 {vcom -work work -2002 -explicit -stats=none {C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd}
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity main_tb
+-- Compiling architecture behavior of main_tb
+** Error: C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(22): Nonresolved signal 'state' has multiple sources.
+  Drivers:
+    C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(117):Process PROC_OUTP
+       Driven at:
+          C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(120)
+    C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(75):Process RESET_PROC
+       Driven at:
+          C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(111)
+** Note: C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_tb.vhd(158): VHDL Compiler exiting
+
+} {8.0 9.0} {}} {C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_function.vhd} {1 {vcom -work work -2002 -explicit -stats=none {C:/Users/Disa/Documents/PSD/Proyek Akhir/Digital-Lock-System/main_function.vhd}
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling package main_function
+-- Compiling package body main_function
+-- Loading package main_function
+
+} {} {}}
