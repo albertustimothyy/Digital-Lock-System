@@ -22,7 +22,6 @@ Muhammad Fajri Alqomaril &nbsp;&nbsp;(2106651635) </br>
 ## Features
 Berikut fitur-fitur yang digunakan
 
-</br>
 
 ### 7-Segment
 `7-Segment digunakan sebagai user interface untuk menampilkan password yang sedang diinput oleh user ke dalam Digital Lock System.`
