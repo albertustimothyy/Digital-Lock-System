@@ -1,6 +1,7 @@
 -- Test Bench
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
 ENTITY main_tb IS
 END main_tb;
@@ -27,7 +28,6 @@ ARCHITECTURE behavior OF main_tb IS
 
     SIGNAL CLOCK : STD_LOGIC;
     CONSTANT clk_period : TIME := 100 ps;
-
 BEGIN
     -- Instantiate the Unit Under Test (UUT)
     uut : main PORT MAP(
@@ -113,48 +113,20 @@ BEGIN
         RESET_BTN <= '1';
         WAIT FOR clk_period;
         RESET_BTN <= '0';
+        SWITCH <= "0010";
         WAIT FOR clk_period * 2;
 
-        SWITCH <= "0000";
-        NEXT_BTN <= '1';
-        WAIT FOR clk_period * 8;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "01111111" AND SEVEN_SEGMENT = "1111001")
-        REPORT "Failed at input 1 (Wrong)" SEVERITY warning;
+        FOR i IN 0 TO 4 LOOP
+            SWITCH <= STD_LOGIC_VECTOR(unsigned(SWITCH) + 1);
+            NEXT_BTN <= '1';
+            WAIT FOR clk_period * 8;
+        END LOOP;
 
         SWITCH <= "0101";
         NEXT_BTN <= '1';
-        WAIT FOR clk_period * 8;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "10111111" AND SEVEN_SEGMENT = "0100100")
-        REPORT "Failed at input 2 (Wrong)" SEVERITY warning;
-
-        SWITCH <= "0101";
-        NEXT_BTN <= '1';
-        WAIT FOR clk_period * 8;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "11011111" AND SEVEN_SEGMENT = "0110000")
-        REPORT "Failed at input 3 (Wrong)" SEVERITY warning;
-        WAIT FOR clk_period * 8;
-
-        SWITCH <= "0011";
-        NEXT_BTN <= '1';
-        WAIT FOR clk_period * 8;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "11101111" AND SEVEN_SEGMENT = "0011001")
-        REPORT "Failed at input 4 (Wrong)" SEVERITY warning;
-
-        SWITCH <= "0100";
-        NEXT_BTN <= '1';
-        WAIT FOR clk_period * 8;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "11110111" AND SEVEN_SEGMENT = "0010010")
-        REPORT "Failed at input 5 (Wrong)" SEVERITY warning;
-
-        SWITCH <= "0101";
-        NEXT_BTN <= '1';
-        WAIT FOR clk_period;
-        ASSERT (LED = "0000000000000000" AND DIGITS = "11111011" AND SEVEN_SEGMENT = "0000010")
-        REPORT "Failed at input 6 (Wrong)" SEVERITY warning;
-
+        WAIT FOR clk_period * 5;
         ASSERT (LED = "0000000000000000" AND DIGITS = "11111110" AND SEVEN_SEGMENT = "0001001")
         REPORT "Wrong Password" SEVERITY warning;
-        WAIT FOR clk_period * 4;
 
         -------------------------------
         -- Method 2 (Wrong)

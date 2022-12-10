@@ -72,7 +72,6 @@ PACKAGE BODY main_function IS
         RETURN STD_LOGIC_VECTOR IS
         VARIABLE hash_value : STD_LOGIC_VECTOR(31 DOWNTO 0);
     BEGIN
-
         hash_value(31 DOWNTO 28) := hash_input(3 DOWNTO 0) XOR "1010";
         hash_value(27 DOWNTO 24) := hash_input(7 DOWNTO 4) XOR hash_input(3 DOWNTO 0);
         hash_value(23 DOWNTO 20) := hash_input(11 DOWNTO 8) XOR "0101";
