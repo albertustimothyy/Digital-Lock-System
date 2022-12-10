@@ -19,7 +19,10 @@ END main;
 -- Architecture
 ARCHITECTURE rtl OF main IS
     -- Declaration Main State
-    TYPE states IS (INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET, INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, RESET_RANDOM);
+    TYPE states IS (
+        INIT, BUSY1, BUSY2, BUSY3, BUSY4, BUSY5, BUSY6, RESET,
+        INIT_RANDOM, BUSY1_RANDOM, BUSY2_RANDOM, ENCRYPTING_RANDOM, RESET_RANDOM
+    );
     SIGNAL state : states;
 
     -- Declaration for Clock 
@@ -54,7 +57,7 @@ ARCHITECTURE rtl OF main IS
 
     -- Hashed Password
     SIGNAL hashed_password : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    SIGNAL rand_hashed_password : STD_LOGIC_VECTOR(11 DOWNTO 0);
+    SIGNAL rand_hashed_password, rand_hashed_input : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
 BEGIN
     -- Main Process
@@ -70,7 +73,7 @@ BEGIN
                 END IF;
                 debounce_signal <= '0';
                 WHEN SHIFT_STATE =>
-                IF (count_shift = 8) THEN
+                IF (count_shift = 6) THEN
                     count_shift <= 0;
                     IF (NEXT_BTN = '1') THEN
                         debounce_signal <= '1';
@@ -142,10 +145,13 @@ BEGIN
                         WHEN 6 => answer(3 DOWNTO 0) <= "0101";
                         WHEN OTHERS => answer(3 DOWNTO 0) <= "0000";
                     END CASE;
-                    rand_hashed_password <= random_simple_hash(answer);
                     state <= BUSY2_RANDOM;
                     WHEN BUSY2_RANDOM =>
                     random_input(3 DOWNTO 0) <= SWITCH(3 DOWNTO 0);
+                    state <= ENCRYPTING_RANDOM;
+                    WHEN ENCRYPTING_RANDOM =>
+                    rand_hashed_input <= random_simple_hash(random_input);
+                    rand_hashed_password <= random_simple_hash(answer);
                     state <= RESET_RANDOM;
                     WHEN RESET_RANDOM =>
                     state <= RESET_RANDOM;
@@ -200,9 +206,11 @@ BEGIN
             WHEN BUSY2_RANDOM =>
                 dig := "10111111";
                 seg := bcd_to_7segment(integer_to_4bits(rand_pass_2));
+            WHEN ENCRYPTING_RANDOM =>
+
             WHEN RESET_RANDOM =>
                 -- Cheking Input 
-                IF rand_hashed_password = random_simple_hash(random_input) THEN
+                IF rand_hashed_password = rand_hashed_input THEN
                     LED <= "1111111111111111";
                     dig := "11111110";
                     seg := "1000000";
