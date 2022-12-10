@@ -59,23 +59,7 @@ ARCHITECTURE rtl OF main IS
     SIGNAL hashed_password : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL rand_hashed_password, rand_hashed_input : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
-<<<<<<< HEAD
-    -- Clock process
-    PROCESS (CLOCK) BEGIN
-        IF rising_edge(CLOCK) THEN
-            IF count_slow = 1500000 THEN
-                clk_slow <= '1';
-                count_slow <= 0;
-            ELSE
-                clk_slow <= '0';
-                count_slow <= count_slow + 1;
-            END IF;
-        END IF;
-    END PROCESS;
-
-=======
 BEGIN
->>>>>>> 9cb8f0273df614dd9d25e8dfe68064ef53fb251c
     -- Main Process
     PROCESS (CLOCK, RESET_BTN, RESET2_BTN)
     BEGIN
@@ -202,22 +186,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-<<<<<<< HEAD
-    -- Clock for Displaying Output
-    PROCESS (CLOCK)
-    BEGIN
-        IF rising_edge (CLOCK) THEN
-            display_counter <= display_counter + 1;
-            IF display_counter = "1110001101010000" THEN
-                display_counter <= (OTHERS => '0');
-            END IF;
-        END IF;
-    END PROCESS;
 
-    
-=======
-
->>>>>>> 9cb8f0273df614dd9d25e8dfe68064ef53fb251c
     -- Output Process
     Output : PROCESS (state)
         VARIABLE seg : STD_LOGIC_VECTOR(6 DOWNTO 0);
