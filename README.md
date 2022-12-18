@@ -58,4 +58,4 @@ Berikut fitur-fitur yang digunakan
 </br>
 </br>
 ## Presentation
-[![Video Presentasi A2](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/ZEdMAtcNWLU)
+[![Watch the video](https://github.com/Eldisja/Digital-Lock-System/blob/main/Presentasi_Digital_Lock_System.png)](https://youtu.be/vt5fpE0bzSY)
