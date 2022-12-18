@@ -57,5 +57,6 @@ Berikut fitur-fitur yang digunakan
 `Debounce algorithm memiliki dua state yang akan berubah jika NEXT_BTN berubah nilai. Seperti pada gambar, state dari DEBOUNCE_INIT berubah ketika NEXT_BUTTON bernilai 1 dan tetap pada state yang sama saat NEXT_BUTTON bernilai 0. Sementara itu, state dari SHIFT_STATE berubah ketika NEXT_BUTTON bernilai 0 dan tetap pada state yang sama saat NEXT_BUTTON bernilai 1. `
 </br>
 </br>
-## Presentation
-[![Watch the video](https://github.com/Eldisja/Digital-Lock-System/blob/main/Presentasi_Digital_Lock_System.png)](https://youtu.be/vt5fpE0bzSY)
+
+## Presentation 
+[![Watch the video](Presentasi_Digital_Lock_System.png)](https://youtu.be/ZEdMAtcNWLU)
