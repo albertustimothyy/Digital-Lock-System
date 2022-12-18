@@ -56,3 +56,6 @@ Berikut fitur-fitur yang digunakan
 ![alt text](FSM_3.png)</br>
 `Debounce algorithm memiliki dua state yang akan berubah jika NEXT_BTN berubah nilai. Seperti pada gambar, state dari DEBOUNCE_INIT berubah ketika NEXT_BUTTON bernilai 1 dan tetap pada state yang sama saat NEXT_BUTTON bernilai 0. Sementara itu, state dari SHIFT_STATE berubah ketika NEXT_BUTTON bernilai 0 dan tetap pada state yang sama saat NEXT_BUTTON bernilai 1. `
 </br>
+</br>
+## Presentation
+[![Video Presentasi A2](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/ZEdMAtcNWLU)
